@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import jwtDecode from 'jwt-decode'
 
 function LoginPage({ setUserRole}) {
   const [form, setForm] = useState({ username: '', password: '' })
@@ -29,10 +30,15 @@ function LoginPage({ setUserRole}) {
       //Save token to LocalStorage
       localStorage.setItem('token', data.token)
 
-      //Decode role from response
-      if (data.user && data.user.role) {
-        setUserRole(data.user.role)
-      }
+      //Decode role from JWT
+      try {
+        const decoded = jwtDecode(data.token)
+        setUserRole(decoded.role)
+      } catch (err) {
+        console.error('Error decoding token:', err)
+        
+      
+    }
 
       //Navigate to courses
       navigate('/courses')
@@ -42,16 +48,22 @@ function LoginPage({ setUserRole}) {
     }
   }
   return (
-    <div className="page">
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit} >
+    <div className="login-container">
+      <h1 className="login-name">Login</h1>
+      <form className= "loging-form" onSubmit={handleSubmit} >
+        <div className ="form-group">
+          <label>Username</label>
+        
         <input
         type="text"
         name="username"
         placeholder="Username"
         value={form.username}
-        onChange={(e) => setForm({ ...form, username: e.target.value })}
+        onChange={handleChange}
         />
+        </div>
+        <div className ="form-group">
+          <label>Password</label>
         <input
         type="password"
         name="password"
@@ -59,9 +71,11 @@ function LoginPage({ setUserRole}) {
         value={form.password}
         onChange={handleChange}
         />
+        </div>
+        {error && <p className="error">{error}</p>}
         <button type = "submit">Login</button>
         </form>
-        {error && <p className="error">{error}</p>}
+        
         </div>
   )
 }

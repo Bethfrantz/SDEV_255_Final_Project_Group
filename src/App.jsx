@@ -4,24 +4,46 @@ import Home from './pages/Home.jsx'
 import Courses from './pages/Courses.jsx'
 import AddCourse from './pages/AddCourse.jsx'
 import StudentSchedule from './pages/StudentSchedule.jsx'
+import LoginPage from './pages/LoginPage.jsx'
 import { useState, useEffect } from 'react'
+import jwtDecode from 'jwt-decode'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
+import WelcomeBanner from './components/WelcomeBanner.jsx'
 
 function App() {
-  const [courses, setCourses] = useState([]
-)
-const [userRole, setUserRole] = useState('student') // 'student' or 'teacher'
-  useEffect(() => {
+  const [courses, setCourses] = useState([])
+
+const [userRole, setUserRole] = useState(null) // null until loging
+const navigate = useNavigate()
+//Load courses
+ useEffect(() => {
     fetch('http://localhost:5000/api/courses')
     .then(res => res.json())
     .then(data => setCourses(data))
     .catch(err => console.error('Error fetching courses:', err));
   }, [])
 
+  //on app load, ceck for token and set role
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      try{
+      const decoded = jwtDecode(token)
+      setUserRole(decoded.role)
+    } catch (err) {
+      console.error('Invalid token:', err)
+      localStorage.removeItem('token')
+    }
+  }
+}, [])
+// Add course
   const addCourse = async (course) => {
     try {
       const res = await fetch('http://localhost:5000/api/courses', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify(course)
       })
       const newCourse = await res.json()
@@ -31,11 +53,14 @@ const [userRole, setUserRole] = useState('student') // 'student' or 'teacher'
     }
     
   }
-
+// Delete course
   const deleteCourse = async (id) => {
     try {
       await fetch(`http://localhost:5000/api/courses/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
     })
     
     setCourses(courses.filter((course) => course._id !== id))
@@ -43,20 +68,41 @@ const [userRole, setUserRole] = useState('student') // 'student' or 'teacher'
     console.error('Error deleting course:', err)
   }
   }
+  //Logout flow
+  const logout = () => {
+    localStorage.removeItem('token')
+    setUserRole(null)
+    navigate('/login')
+  }
   return (
     <div>
       <Navbar userRole={userRole} />
+      <WelcomeBanner userRole={userRole} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route
           path="/courses"
           element={<Courses courses={courses} onDelete={deleteCourse} userRole={userRole} />}
         />
+        //teacher-only route
         <Route
           path="/add-course"
-          element={<AddCourse onAdd={addCourse} userRole={userRole} />}
+          element={<ProtectedRoute userRole={userRole} allowedRoles={['teacher']}>
+          <AddCourse onAdd={addCourse} userRole={userRole} />
+          </ProtectedRoute>
+          }
         />
-        <Route path="/schedule" element={<StudentSchedule courses={courses} userRole = {userRole}/>} />
+        //student-only route
+        <Route path="/schedule" 
+        element={<ProtectedRoute userRole={userRole} allowedRoles={['student']}>
+        <StudentSchedule courses={courses} userRole = {userRole}/>
+        </ProtectedRoute>
+        }
+        />
+        <Route
+          path="/login"
+          element={<LoginPage setUserRole={setUserRole} />}
+        />
       </Routes>
     </div>
   )
