@@ -1,6 +1,6 @@
 function Courses({ courses, onDelete }) {
   return (
-    <div className="page">
+    <div className="page app-page">
       <h1>All Courses</h1>
       {courses.length === 0 ? (
         <p>No courses available.</p>
