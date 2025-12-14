@@ -29,7 +29,7 @@ function AddCourse({ onAdd }) {
   }
 
   return (
-    <div className="page">
+    <div className="page app-page">
       <h1>Add a New Course</h1>
       <form onSubmit={handleSubmit}>
         <input
