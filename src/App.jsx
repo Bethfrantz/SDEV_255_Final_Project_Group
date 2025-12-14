@@ -19,7 +19,7 @@ const navigate = useNavigate()
  useEffect(() => {
     fetch('http://localhost:5000/api/courses')
     .then(res => res.json())
-    .then(data => setCourses(data))
+    .then(data => setCourses(data.courses))
     .catch(err => console.error('Error fetching courses:', err));
   }, [])
 
@@ -46,8 +46,10 @@ const navigate = useNavigate()
         },
         body: JSON.stringify(course)
       })
-      const newCourse = await res.json()
-      setCourses([...courses, newCourse])
+      const data = await res.json()
+      if(data.success){
+      setCourses([...courses, data.course])
+      }
     } catch (err) {
       console.error('Error adding course:', err)
     }
@@ -76,8 +78,8 @@ const navigate = useNavigate()
   }
   return (
     <div>
-      <Navbar userRole={userRole} />
-      <WelcomeBanner userRole={userRole} />
+      <Navbar userRole={userRole} logout={logout}/>
+      <WelcomeBanner userRole={userRole} logout={logout}/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route

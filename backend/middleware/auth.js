@@ -25,14 +25,20 @@ exports.protect = async (req, res, next) => {
     // Get user from token
     const user = await User.findById(decoded.id);
 
-    if (!req.user) {
+    if (!user) {
       return res.status(401).json({
         success: false,
         message: 'User not found'
       });
     }
 //attach user to request
-req.user = user;
+req.user =  {
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role
+
+}
     next();
   } catch (err) {
     return res.status(401).json({

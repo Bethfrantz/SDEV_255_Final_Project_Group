@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import jwtDecode from 'jwt-decode'
+import {AuthContext} from '../context/AuthContext.js'
 
 function LoginPage({ setUserRole}) {
   const [form, setForm] = useState({ username: '', password: '' })
   const [error, setError] = useState('')
   const navigate = useNavigate()
+  
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
@@ -50,15 +52,15 @@ function LoginPage({ setUserRole}) {
   return (
     <div className="login-container">
       <h1 className="login-name">Login</h1>
-      <form className= "loging-form" onSubmit={handleSubmit} >
+      <form className= "login-form" onSubmit={handleSubmit} >
         <div className ="form-group">
-          <label>Username</label>
+          <label>Email</label>
         
         <input
         type="text"
-        name="username"
-        placeholder="Username"
-        value={form.username}
+        name="email"
+        placeholder="Email"
+        value={form.email}
         onChange={handleChange}
         />
         </div>

@@ -4,9 +4,9 @@ import React, { useState } from 'react'
 function Courses({ courses, onDelete, userRole }) {
   const [searchTerm, setSearchTerm] = useState('')
 
-  const filterCourses = courses.filter(course =>
-    course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    course.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredCourses = courses.filter(course =>
+    course.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    course.subjectArea.toLowerCase().includes(searchTerm.toLowerCase()) ||
     course.description.toLowerCase().includes(searchTerm.toLowerCase())
   )
   return (
@@ -25,7 +25,7 @@ function Courses({ courses, onDelete, userRole }) {
             <tr>
               <th>Course Name</th>
               <th>Description</th>
-              <th>Subject</th>
+              <th>Subject Area</th>
               <th>Credits</th>
               <th>Teacher</th>
               {userRole === 'teacher' && <th>Action</th>}
@@ -34,15 +34,15 @@ function Courses({ courses, onDelete, userRole }) {
           <tbody>
             {filteredCourses.map(course => (
               <tr key={course._id}>
-                <td>{course.name}</td>
+                <td>{course.courseName}</td>
                 <td>{course.description}</td>
-                <td>{course.subject}</td>
+                <td>{course.subjectArea}</td>
                 <td>{course.credits}</td>
                 <td>{course.teacher}</td>
                 {userRole === 'teacher' && (
                   <td>
                     <button onClick={() => onDelete(course._id)}>Delete</button>
-                    {/* Future: <button onClick={() => onEdit(course._id)}>Edit</button> */}
+                    <button onClick={() => onEdit(course._id)}>Edit</button> 
                   </td>
                 )}
               </tr>

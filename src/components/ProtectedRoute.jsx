@@ -1,4 +1,4 @@
-import {Navigated} from 'react-router-dom'
+import {Navigate} from 'react-router-dom'
 function ProtectedRoute({ userRole, allowedRoles, children }) {
     const token = localStorage.getItem('token')
     //if no token, redirect to login

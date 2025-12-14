@@ -1,19 +1,20 @@
-function StudentSchedule({ courses, userRole }) {
+function StudentSchedule({ enrollments, userRole }) {
     if (userRole !== 'student') {
         return <p>Only students can view schedules</p>
     }
-    const enrolledCourses = courses.filter(c => c.enrolled === true)
+    
 
     return (
         <div className="page">
             <h1>My Schedule</h1>
-            {enrolledCourses.length === 0 ? (
+            {enrollments.length === 0 ? (
                 <p>You are not enrolled in any courses.</p>
             ) : (
                 <ul>
-                    {enrolledCourses.map(course => (
-                        <li key={course._id}>
-                            {course.name} - {course.subject} ({course.credits} credits)
+                    {enrollments.map(enrollment => (
+                        <li key={enrollment._id}>
+                            {enrollment.course.courseName} - {enrollment.course.subjectArea} 
+                            ({enrollment.course.credits} credits) | Teacher: {enrollment.course.teacher?.name}
                             </li>
                     ))}
                 </ul>
